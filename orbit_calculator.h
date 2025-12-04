@@ -11,10 +11,24 @@ typedef struct {
 	Complex z;
 } OrbitResult;
 
-Complex add_complex(Complex a, Complex b);
-Complex mult_complex(Complex a, Complex b);
-double modulus_squared_complex(Complex a);
-Complex pow_complex_int(Complex a, int k);
+// Funções marcadas como static inline para o compilador "colar" o código direto no loop
+static inline Complex add_complex(Complex a, Complex b){
+    Complex c;
+    c.Re = a.Re + b.Re;
+    c.Im = a.Im + b.Im;
+    return c;
+}
+
+static inline Complex mult_complex(Complex a, Complex b) {
+    Complex c;
+    c.Re = ((a.Re*b.Re) - (a.Im*b.Im));
+    c.Im = ((a.Im*b.Re)+(a.Re*b.Im));
+    return c;    
+}
+
+static inline double modulus_squared_complex(Complex a) {
+    return ((a.Re*a.Re) + (a.Im*a.Im));
+}
 
 OrbitResult mandelbrot_orbit(Complex c, int k, int maxit);
 
