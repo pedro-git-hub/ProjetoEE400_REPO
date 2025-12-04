@@ -51,6 +51,21 @@ OrbitResult mandelbrot_orbit(Complex c, int k, int maxit) {
 }
 
 
-int julia_orbit(Complex c, Complex z0, int k, int maxit) {
-	return 0;
+OrbitResult julia_orbit(Complex c, Complex z0, int k, int maxit) {
+	Complex z = z0;
+	OrbitResult r;
+
+	for (int i = 0; i < maxit; i++) {
+		z = add_complex(pow_complex_int(z,k), c);
+
+		if (modulus_squared_complex(z) > 4.0) {
+			r.iter = i;
+			r.z = z;
+			return r;
+		}
+	}
+
+	r.iter = maxit;
+	r.z = z;
+	return r;
 }

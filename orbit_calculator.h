@@ -18,6 +18,6 @@ Complex pow_complex_int(Complex a, int k);
 
 OrbitResult mandelbrot_orbit(Complex c, int k, int maxit);
 
-int julia_orbit(Complex c, Complex z0, int k, int maxit);
+OrbitResult julia_orbit(Complex c, Complex z0, int k, int maxit);
 
 #endif

@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include "orbit_calculator.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1920
+#define HEIGHT 1080
 
 int main() {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -30,7 +30,8 @@ int main() {
 		WIDTH,
 		HEIGHT
 		);
-
+	int mode = 0; // Mandelbrot por padrao
+	Complex julia_c = {-0.8, 0.156}; // valor comum de Julia
 
 	uint32_t *pixels = malloc(WIDTH * HEIGHT * sizeof(uint32_t));
 
@@ -41,25 +42,47 @@ int main() {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT)
 				running = 0;
-			
-			double xmin = -2.0;
-			double xmax = 1.0;
-			double ymin = -1.5;
-			double ymax = 1.5;
+			if (e.type == SDL_KEYDOWN) {
+				if (e.key.keysym.sym == SDLK_j) {
+					mode = 1 - mode; // toggle entre Mandelbrot e Julia
+				}
+			}
 
-			int k = 2;
-			int maxit = 300;
+			int k = 2;	
+			double x_center = -pow(1.0 -1.0/k, (double)k/(k - 1.0));
+			double y_center = 0.0;
+			double dx = 6.0;
+			double dy = dx * (double)HEIGHT/WIDTH;
+			double xmin = x_center - dx/2.0;
+			double xmax = x_center + dx/2.0;
+			double ymin = y_center - dy/2.0;
+			double ymax = y_center + dy/2.0;
+
+			int maxit = 100000;
 
 			for (int py = 0; py < HEIGHT; py++) {
+				SDL_PollEvent(&e);
+   	 				if (e.type == SDL_QUIT) {
+       		 				running = 0;
+       			 			break;
+    				}
 				for (int px = 0; px < WIDTH; px++){
 					if (px % 200 == 0)
 						SDL_PumpEvents();	
 					double cr = xmin + (double)px / WIDTH * (xmax - xmin);
 					double ci = ymin + (double)py/ HEIGHT * (ymax - ymin);
 
-					Complex c = {cr, ci};
-
-					OrbitResult r = mandelbrot_orbit(c, k, maxit);
+					OrbitResult r;
+					
+					if (mode == 0) {
+						// Mandelbrot
+						Complex c = {cr, ci};
+						r = mandelbrot_orbit(c, k, maxit); 
+					} else {
+						// Julia
+						Complex z0 = {cr, ci};
+						r = julia_orbit(julia_c, z0, k, maxit);
+					}
 
 					double lambda;
 
@@ -69,7 +92,7 @@ int main() {
 						double abs_z = sqrt(modulus_squared_complex(r.z));
 						lambda = r.iter + 1 - (log(log(abs_z))) / log((double)k);
 					}
-					double t = lambda/maxit;
+					double t = lambda/(lambda+8.0);
 
 					uint8_t rcol = (uint8_t)(9*(1-t)*t*t*t*255);
 					uint8_t gcol = (uint8_t)(15*(1-t)*(1-t)*t*t*255);
