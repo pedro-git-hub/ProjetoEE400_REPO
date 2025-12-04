@@ -59,11 +59,22 @@ int main() {
 
 					Complex c = {cr, ci};
 
-					int iter = mandelbrot_orbit(c, k, maxit);
+					OrbitResult r = mandelbrot_orbit(c, k, maxit);
 
-					uint8_t color = (uint8_t)(255.0 * iter/maxit);
+					double lambda;
 
-					pixels[py * WIDTH + px] = (255 << 24) | (color << 16) | (color << 8) | color;
+					if (r.iter == maxit) {
+						lambda = maxit;
+					} else {
+						double abs_z = sqrt(modulus_squared_complex(r.z));
+						lambda = r.iter + 1 - (log(log(abs_z))) / log((double)k);
+					}
+					double t = lambda/maxit;
+
+					uint8_t rcol = (uint8_t)(9*(1-t)*t*t*t*255);
+					uint8_t gcol = (uint8_t)(15*(1-t)*(1-t)*t*t*255);
+					uint8_t bcol = (uint8_t)(8.5*(1-t)*(1-t)*(1-t)*t*255);
+					pixels[py * WIDTH + px] = (255 << 24) | (rcol << 16) | (gcol << 8) | bcol;
 				}
 			}
 		}
