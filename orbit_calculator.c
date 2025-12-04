@@ -31,17 +31,23 @@ Complex pow_complex_int(Complex a, int k) {
 }
 
 
-int mandelbrot_orbit(Complex c, int k, int maxit) {
+OrbitResult mandelbrot_orbit(Complex c, int k, int maxit) {
 	Complex z = {0.0, 0.0};
+	OrbitResult r; 
 
 	for (int i = 0; i < maxit; i++) {
 		z = add_complex(pow_complex_int(z, k), c);
 
-		if (modulus_squared_complex(z) > 4.0)
-			return i;
+		if (modulus_squared_complex(z) > 4.0) {
+			r.iter = i;
+			r.z = z;
+			return r;
+		}
 	}
 
-	return maxit;
+	r.iter = maxit;
+	r.z = z;
+	return r;
 }
 
 
