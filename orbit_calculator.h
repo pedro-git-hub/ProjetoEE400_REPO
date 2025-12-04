@@ -2,8 +2,8 @@
 #define ORBIT_CALCULATOR_H
 
 typedef struct {
-	double Re;
-	double Im;
+	long double Re;
+	long double Im;
 } Complex;
 
 typedef struct {
@@ -26,7 +26,7 @@ static inline Complex mult_complex(Complex a, Complex b) {
     return c;    
 }
 
-static inline double modulus_squared_complex(Complex a) {
+static inline long double modulus_squared_complex(Complex a) {
     return ((a.Re*a.Re) + (a.Im*a.Im));
 }
 
