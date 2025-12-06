@@ -23,6 +23,6 @@ Aperte J enquanto na janela para alternar entre o fractal de Mandelbrot e o de J
 
 Aperte Z enquanto na janela para dar zoom na posição do mouse.
 
-Para alterar coisas como o raio de convergência ou o z0 inicial, é necessário editar o arquivo orbit_calculator.c para adequar os parâmetros desejados.
+Aperte R enquanto na janela para resetar o zoom.
 
 O executável nesse documento vem com todos os valores padrões indicados no terminal.

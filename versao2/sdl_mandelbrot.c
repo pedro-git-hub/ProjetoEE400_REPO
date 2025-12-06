@@ -1,12 +1,17 @@
 #include "orbit_calculator.h"
 #include <SDL2/SDL.h>
-#include <omp.h> // Importante para as funções do OpenMP
+#include <omp.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #define WIDTH 1920
 #define HEIGHT 1080
 #define DX_original 8.0
+
+long double raio_convergencia_quadrado; // Ele deve ser ao quadrado
+                                        // pra evitar ter que elevar
+                                        // um número complexo ao quadrado
+                                        // desnecessariamente
 
 // Essa função lê o stdin e se for vazio, retorna o valor padrão. Mas se
 // recebermos um valor novo, então retorna este valor novo
@@ -119,7 +124,7 @@ void calcular_pixels(long double dx, long double x_center, long double y_center,
       long double z_re2 = z.Re * z.Re;
       long double z_im2 = z.Im * z.Im;
 
-      while ((z_re2 + z_im2 <= 4.0) && (iter < maxit)) {
+      while ((z_re2 + z_im2 <= raio_convergencia_quadrado) && (iter < maxit)) {
 
         // Aqui a fizemos uma otimização para o k = 2 pois ele é tão simples que
         // não é necessário entrar em um loop para executá-lo
@@ -145,10 +150,14 @@ void calcular_pixels(long double dx, long double x_center, long double y_center,
           z.Re = acc_re + c.Re;
           z.Im = acc_im + c.Im;
         }
+
+        z_re2 = z.Re * z.Re;
+        z_im2 = z.Im * z.Im;
+
+        iter++;
       }
 
-      // Coloração (Simplificada para evitar log/sqrt pesados dentro do loop
-      // crítico se não necessário)
+      // Coloração (Simplificada para evitar log/sqrt)
       //
       // TODO: voltar com o log e o sqrt para ver se não fica mais bonito.
       uint32_t color;
@@ -249,9 +258,14 @@ int main() {
   julia_c.Re = ler_longdouble_com_padrao("Re", julia_c.Re);
   julia_c.Im = ler_longdouble_com_padrao("Im", julia_c.Im);
 
+  long double raio_convergencia = ler_longdouble_com_padrao("Raio de Convergência", 2.0);
+
+  raio_convergencia_quadrado = raio_convergencia * raio_convergencia;
+
   maxit = ler_inteiro_com_padrao("Qual o número de iterações máximo", maxit);
 
   k = ler_inteiro_com_padrao("Qual o k desejado", k);
+
 
   // O zoom modifica o maxit. Então precisamos guardar o valor original para
   // restaurar
@@ -330,7 +344,6 @@ int main() {
     // Só recalculamos tudo se for necessário
     if (needs_refresh) {
 
-      // TODO: ver se essa informação de debug é realmente necessária
       printf("Zoom atual (largura da tela): %.18Lf\n", dx);
 
       // Configurações iniciais da barra de progresso
