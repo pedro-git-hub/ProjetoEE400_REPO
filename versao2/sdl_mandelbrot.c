@@ -116,8 +116,6 @@ void calcular_pixels(long double dx, long double x_center, long double y_center,
       int iter = 0;
       long double temp_re;
 
-      // OTIMIZAÇÃO CRÍTICA: Loop desenrolado manualmente para k=2
-      // Isso evita chamadas de função e permite o compilador usar AVX
       long double z_re2 = z.Re * z.Re;
       long double z_im2 = z.Im * z.Im;
 
@@ -126,8 +124,6 @@ void calcular_pixels(long double dx, long double x_center, long double y_center,
         // Aqui a fizemos uma otimização para o k = 2 pois ele é tão simples que
         // não é necessário entrar em um loop para executá-lo
         if (k == 2) {
-          // --- ROTA OTIMIZADA (HARDCODED) ---
-          // Seu código atual, extremamente rápido (pode vetorizar com AVX)
           z.Im = 2.0 * z.Re * z.Im + c.Im;
           z.Re = z_re2 - z_im2 + c.Re;
         }
@@ -155,12 +151,10 @@ void calcular_pixels(long double dx, long double x_center, long double y_center,
       // crítico se não necessário)
       //
       // TODO: voltar com o log e o sqrt para ver se não fica mais bonito.
-      // Isso aqui foi o Gemini que mudou para otimizar
       uint32_t color;
       if (iter == maxit) {
         color = 0xFF000000; // Preto
       } else {
-        // Truque simples de coloração sem muita matemática pesada
         long double t = (long double)iter / (long double)(iter + 8);
         uint8_t r = (uint8_t)(9 * (1 - t) * t * t * t * 255);
         uint8_t g = (uint8_t)(15 * (1 - t) * (1 - t) * t * t * 255);
