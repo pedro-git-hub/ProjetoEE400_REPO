@@ -7,13 +7,39 @@
 #define HEIGHT 1080
 
 int main() {
+
+	// Constantes importantes
+	int mode = 0; // Mandelbrot por padrao
+	Complex julia_c = {-0.8, 0.156}; // valor comum de Julia
+	int k = 2; // k = 2 padrao
+	int maxit = 200; // 200 iteracoes como padrao
+	int render = 1; // bit para controlar os calculos	
+
+	printf("Escolha o expoente k [k_padrao = 2]: \n");
+	scanf("%d", &k);
+	if (k < 2)
+		k = 2;
+
+	printf("Escolha o numero maximo de iteracoes (<= 4000)[padrao = 200]: \n");
+	scanf("%d", &maxit);
+	if (maxit > 4000)
+		maxit = 4000;
+
+	printf("Escolha as componentes do c para Julia.\n");
+	printf("Escolha Re(c)[padrao = -0.8]: \n");
+	scanf("%lf", &julia_c.Re);
+
+	printf("Escolha o Im(c)[padrao = 0.156]: \n");
+	scanf("%lf", &julia_c.Im);
+
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		printf("SDL_Init ERROR: %s\n", SDL_GetError());
 		return 1;
 	}
 
 	SDL_Window *window = SDL_CreateWindow(
-		"Pixel Test",
+		"Mandelbrot&Julia Sets",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		WIDTH, HEIGHT,
 		SDL_WINDOW_SHOWN
@@ -30,8 +56,6 @@ int main() {
 		WIDTH,
 		HEIGHT
 		);
-	int mode = 0; // Mandelbrot por padrao
-	Complex julia_c = {-0.8, 0.156}; // valor comum de Julia
 
 	uint32_t *pixels = malloc(WIDTH * HEIGHT * sizeof(uint32_t));
 
@@ -45,10 +69,11 @@ int main() {
 			if (e.type == SDL_KEYDOWN) {
 				if (e.key.keysym.sym == SDLK_j) {
 					mode = 1 - mode; // toggle entre Mandelbrot e Julia
+					render = 1; // recalcular o conjunto
 				}
 			}
-
-			int k = 2;	
+		}
+		if (render) {
 			double x_center = -pow(1.0 -1.0/k, (double)k/(k - 1.0));
 			double y_center = 0.0;
 			double dx = 6.0;
@@ -58,9 +83,9 @@ int main() {
 			double ymin = y_center - dy/2.0;
 			double ymax = y_center + dy/2.0;
 
-			int maxit = 100000;
-
 			for (int py = 0; py < HEIGHT; py++) {
+				printf("\rRendering %d%%", (100*py)/HEIGHT);
+				fflush(stdout);
 				SDL_PollEvent(&e);
    	 				if (e.type == SDL_QUIT) {
        		 				running = 0;
@@ -100,14 +125,14 @@ int main() {
 					pixels[py * WIDTH + px] = (255 << 24) | (rcol << 16) | (gcol << 8) | bcol;
 				}
 			}
+
+			SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(uint32_t));
+
+			SDL_RenderClear(renderer);
+			SDL_RenderCopy(renderer, texture, NULL, NULL);
+			SDL_RenderPresent(renderer);
+			render = 0;
 		}
-			
-
-		SDL_UpdateTexture(texture, NULL, pixels, WIDTH * sizeof(uint32_t));
-
-		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, texture, NULL, NULL);
-		SDL_RenderPresent(renderer);
 	}
 
 	free(pixels);
