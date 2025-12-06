@@ -46,8 +46,15 @@ A funcionalidade de zoom foi uma que sentimos falta na versão 1, e por isso
 a implementamos na versão 2. Assim como a falta dos eixos deixava o usuário bastante
 desorientado, por isso os implementamos na versão 2.
 
+#### Extra
+
+Percebemos que utilizar o `scanf` para obtermos os valores customizados não
+foi a melhor opção, pois o usuário precisa reescrevê-los caso queira manter o
+padrão. Na segunda versão isso não é necessário, basta apertar `Enter` que o
+valor padrão já é selecionado
+
 ### Conclusão
 
-A versão 2 é uma versão funcional e melhorada em relação à versão 1, com exceção
-de alguns detalhes que o tornam um pouco mais limitado como a colorização e a
+Em resumo, **a versão 2 é uma versão funcional e melhorada em relação à versão 1**. 
+Apenas alguns detalhes que o tornam um pouco mais limitado como a colorização e
 não permitir diferentes valores de k
